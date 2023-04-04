@@ -157,6 +157,8 @@ class Keypoint:
             logging.error("Failed to load annotation file:{}".format(e))
 
 
+
+
 kp = Keypoint()
 annotations = kp.get_annotation();
 for ann in tqdm(annotations):
