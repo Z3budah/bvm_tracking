@@ -10,6 +10,7 @@ from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 
 from bilibili import Bilibili
+from youtube import Yt_dl
 
 import requests
 import os
@@ -35,6 +36,11 @@ def scrape_bilibili():
     with Pool(processes=4) as pool:
         result = list(tqdm(pool.imap(bilibili.search_video, pages), total=TOTAL_PAGE))
 
+def scrape_youtube():
+    yt_dl = Yt_dl()
+    yt_dl.search_video("fidgety+movements+infant",20)
+    yt_dl.download_video()
 
 if __name__ == '__main__':
-    scrape_bilibili()
+    # scrape_bilibili()
+    scrape_youtube()

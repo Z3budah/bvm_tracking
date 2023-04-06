@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """bilibili.py
- Download baby video from bilibili.
+ Crawl infant videos from bilibili.
 """
 import logging
 import os
@@ -40,7 +40,7 @@ class Bilibili:
         list_add = pattern.findall(content)
         # print(list_add)
         time.sleep(1)
-        logging.info('第{}页'.format(page), list_add)
+        logging.info('page {}'.format(page), list_add)
         self.get_video_url(list_add)
 
     def get_video_url(self, bv_list):
@@ -53,7 +53,7 @@ class Bilibili:
 
             video_info_data = json.loads(video_info)
             video_url = video_info_data['data']['dash']['video'][-1]['base_url']
-            self.download_video(title, video_url)
+            self.download_video(bv_id, video_url)
 
     def download_video(self, title, video_url):
         req = requests.get(video_url, headers=self.headers)
