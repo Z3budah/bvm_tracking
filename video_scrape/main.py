@@ -2,30 +2,18 @@
 
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-import logging
-import sys
 from multiprocessing import Pool
-from concurrent.futures import ThreadPoolExecutor
 
+import numpy as np
 from tqdm import tqdm
 
-from bilibili import Bilibili
-from youtube import Yt_dl
+from video_scrape.bilibili import Bilibili
+from video_scrape.youtube import Yt_dl
 
-import requests
 import os
 import re
-import json
-import time
-from fake_useragent import UserAgent
 
 TOTAL_PAGE = 28
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-
 
 # Press the green button in the gutter to run the script.
 # logging.getLogger().setLevel(logging.INFO)
@@ -38,9 +26,9 @@ def scrape_bilibili():
 
 def scrape_youtube():
     yt_dl = Yt_dl()
-    yt_dl.search_video("fidgety+movements+infant",20)
+    yt_dl.search_video("fidgety+movements+infant", 20)
     yt_dl.download_video()
 
 if __name__ == '__main__':
-    # scrape_bilibili()
+    scrape_bilibili()
     scrape_youtube()

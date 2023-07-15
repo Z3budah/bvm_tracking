@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""keypoint.py
+"""keypointCOCO.py
  Using openpose to get keypoints from videos.
 """
 import sys
@@ -48,8 +48,8 @@ class Keypoint:
         params = dict()
         # specified model
         params["model_folder"] = "../openpose/models/"
-        params["model_pose"] = "COCO"
-        params["net_resolution"] = "256x256"
+        params["model_pose"] = "BODY_25"
+        # params["net_resolution"] = "256x256"
         params["number_people_max"] = 1
 
         # Starting OpenPose
@@ -95,12 +95,14 @@ class Keypoint:
             duration_frame = annotation.get("duration_frame", None)
             keypoint = annotation.get("keypoint", None)
             # if this segment has been detected, skip the remaining code inside this loop
+
             if keypoint and os.path.exists(keypoint):
+                logging.error("Already checked this segment.")
                 continue
 
 
             # keypoint array
-            keypoints = np.empty([1, 18, 3])
+            keypoints = np.empty([1, 25, 3])
 
             # capture the video segment using cv2
             cap.set(cv2.CAP_PROP_POS_FRAMES, start_frame)
@@ -108,9 +110,7 @@ class Keypoint:
             for frame_idx in range(start_frame, end_frame + 1):
                 ret, frame = cap.read()
                 # if frame is read correctly ret is True
-                if not ret:
-                    print("Can't receive frame (stream end?). Exiting ...")
-                    break
+
                 # image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 # Process Image
                 datum = op.Datum()
@@ -118,7 +118,7 @@ class Keypoint:
                 self.opWrapper.emplaceAndPop(op.VectorDatum([datum]))
 
                 try:
-                    # Display Imageb
+                    # Display Image
                     # print("Body keypoints: \n" + str(datum.poseKeypoints) + str(datum.poseKeypoints.shape))
                     keypoints = np.append(keypoints, datum.poseKeypoints, axis=0)
                 except Exception as e:
@@ -131,14 +131,23 @@ class Keypoint:
 
             try:
                 detect_rate = keypoints.shape[0] / duration_frame
+                # baseline: 0.5
 
-                if detect_rate > 0.90:
+                if detect_rate > 0.5:
                     # save keypoint file
                     print(keypoints.shape)
-                    npy_path = os.path.join(self.keypoint_dir, video_id + "_" + str(idx) + ".npy")
-                    print("Keypoint path:" + npy_path)
+
+                    npy_path = os.path.join(self.keypoint_dir, video_id + "_" + str(idx) + ".npy") if label is None \
+                        else os.path.join(self.keypoint_dir, video_id + "_" + label + "_" + str(idx) + ".npy")
+                    print("keypoint path:" + npy_path)
                     np.save(npy_path, keypoints)
                     annotation['keypoint'] = npy_path
+                    # Save the updated JSON file
+                    try:
+                        with open(json_path, "w") as f:
+                            json.dump(data, f, indent=2)
+                    except Exception as e:
+                        logging.error("Failed to load annotation file:{}".format(e))
                 else:
                     logging.error(str(detect_rate) + "means too many frames can not detect keypoint, discard this "
                                                      "video segment")
@@ -149,12 +158,12 @@ class Keypoint:
         cap.release()
         cv2.destroyAllWindows()
 
-        # Save the updated JSON file
-        try:
-            with open(json_path, "w") as f:
-                json.dump(data, f, indent=2)
-        except Exception as e:
-            logging.error("Failed to load annotation file:{}".format(e))
+        # # Save the updated JSON file
+        # try:
+        #     with open(json_path, "w") as f:
+        #         json.dump(data, f, indent=2)
+        # except Exception as e:
+        #     logging.error("Failed to load annotation file:{}".format(e))
 
 
 

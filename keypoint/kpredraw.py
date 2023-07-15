@@ -17,7 +17,7 @@ from scipy.interpolate import interp1d
 
 
 # list of json file paths
-json_dir="../action/annotation"
+json_dir= "../../action/annotation"
 json_files = sorted(
     [
         os.path.join(json_dir, fname)
@@ -95,7 +95,7 @@ pose_colors = [(0, 100, 255), (0, 100, 255), (0, 255, 255), (0, 100, 255), (0, 2
 
 # redraw the joint keypoints
 def redraw(pose_keypoints_2d, image, title, fixed=True):
-    title = (title + "Fixed Pose Keypoints" if fixed else "Original Pose Keypoints")
+    title = ("Fixed Pose Keypoints" if fixed else "Original Pose Keypoints")
     # Loop over each frame and draw the keypoints for each frame
     for idx, frame in enumerate(pose_keypoints_2d):
 
@@ -105,15 +105,15 @@ def redraw(pose_keypoints_2d, image, title, fixed=True):
         for i, pair in enumerate(pose_pairs):
             x1, y1, c1 = keypoints[pair[0]]
             x2, y2, c2 = keypoints[pair[1]]
-            if c1 > c_threshold and c2 > c_threshold:
-                try:
-                    cv2.line(image, (int(x1), int(y1)), (int(x2), int(y2)), pose_colors[i], 3)
-                except Exception as e:
-                    logging.error("bad point frame {}: point{}:[{:.2f},{:.2f}],point {}:[{:.2f},{:.2f}]".format(
-                        idx, pair[0], x1, y1, pair[1], x2, y2))
+            # if c1 > c_threshold and c2 > c_threshold:
+            try:
+                cv2.line(image, (int(x1), int(y1)), (int(x2), int(y2)), pose_colors[i], 3)
+            except Exception as e:
+                logging.error("bad point frame {}: point{}:[{:.2f},{:.2f}],point {}:[{:.2f},{:.2f}]".format(
+                    idx, pair[0], x1, y1, pair[1], x2, y2))
 
         # Display the resulting image
-        cv2.putText(image, "frame:{}".format(idx), (0, 50), cv2.FONT_HERSHEY_COMPLEX, 1, (255,255,255), 3)
+        # cv2.putText(image, "frame:{}".format(idx), (0, 50), cv2.FONT_HERSHEY_COMPLEX, 1, (255,255,255), 3)
         cv2.imshow(title, image)
         if cv2.waitKey(100) & 0xFF == ord('q'):
             break
@@ -159,15 +159,16 @@ if __name__ == '__main__':
     for annotation in data.get(video_id, []):
         if annotation["keypoint"] is None:
             continue
-        if os.path.exists(re.sub("keypoint", "new_keypoint", annotation["keypoint"])):
-            logging.error("Keypoints already fixed.")
-            continue
+        # if os.path.exists(re.sub("keypoint", "new_keypoint", annotation["keypoint"])):
+        #     logging.error("Keypoints already fixed.")
+        #     continue
         print(annotation["keypoint"])
         keypoints = np.load(annotation["keypoint"])
         new_keypoints = fix_lost_keypoint(keypoints,img)
         print(new_keypoints[:,0:14,0:2].shape)
+        run_multiprocess(keypoints , new_keypoints, img, annotation["label"])
         # redraw(new_keypoints, img, annotation["label"])
-        np.save(re.sub("keypoint", "new_keypoint", annotation["keypoint"]), new_keypoints[:,0:14,0:2])
+        np.save(re.sub("", "new_keypoint", annotation["keypoint"]), new_keypoints[:, 0:14, 0:2])
         # run_multiprocess(keypoints, new_keypoints, img, annotation["label"])
 
 
