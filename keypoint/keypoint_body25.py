@@ -246,10 +246,10 @@ video_files = sorted(
 print(video_files)
 
 for vp in video_files:
-    # keypoint_path, error_path = openpose_get_keypoint(vp)
-    # print("keypoint_path:", keypoint_path)
-    keypoint_path = '../action/video/normal general movement-preterm_0_original.npy'
-    error_path = '../action/video/normal general movement-preterm_0_error.npy'
+    keypoint_path, error_path = openpose_get_keypoint(vp)
+    print("keypoint_path:", keypoint_path)
+    #keypoint_path = '../action/video/normal general movement-preterm_0_original.npy'
+    #error_path = '../action/video/normal general movement-preterm_0_error.npy'
     draw_fixed_keypoints(vp, keypoint_path, error_path)
 
 
